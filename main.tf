@@ -7,8 +7,6 @@ terraform {
   }
 }
 
-provider "digitalocean" {}
-
 module "project" {
   source = "./modules/project"
 }

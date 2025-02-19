@@ -28,3 +28,10 @@ resource "digitalocean_droplet" "droplet" {
     digitalocean_ssh_key.terraform_ssh_key.id
   ]
 }
+
+resource "digitalocean_project_resources" "project_resources" {
+  project = var.project_id
+  resources = [
+    digitalocean_droplet.droplet.urn
+  ]
+}

@@ -21,7 +21,7 @@ resource "digitalocean_ssh_key" "terraform_ssh_key" {
 
 resource "digitalocean_droplet" "droplet" {
   name   = "test-droplet"
-  image  = "ubuntu-18-04-x64"
+  image  = "ubuntu-20-04-x64"
   region = "nyc3"
   size   = "s-1vcpu-2gb"
   ssh_keys = [

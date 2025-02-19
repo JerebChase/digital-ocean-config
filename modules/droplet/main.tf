@@ -44,6 +44,7 @@ resource "digitalocean_droplet" "droplet" {
       # install argocd
       "kubectl create namespace argocd",
       "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml",
+      "kubectl patch svc argocd-server -n argocd -p '{\"spec\": {\"type\": \"LoadBalancer\"}}'",
       # install UXP Crossplane
       "kubectl create namespace crossplane",
       "curl -sL https://cli.upbound.io | sh",

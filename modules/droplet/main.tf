@@ -4,10 +4,11 @@ terraform {
       source = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
+    tls = {
+      source = "hashicorp/tls"
+    }
   }
 }
-
-provider "tls" {}
 
 resource "tls_private_key" "ssh_key" {
   algorithm = "ED25519" 

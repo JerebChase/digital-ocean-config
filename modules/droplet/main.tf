@@ -38,10 +38,17 @@ resource "digitalocean_droplet" "droplet" {
   
   provisioner "remote-exec" {
     inline = [
-      "export PATH=$PATH:/usr/bin",
-      # install nginx
-      "sudo apt update",
-      "sudo apt install -y nginx"
+      # install k3s
+      "curl -sfL https://get.k3s.io | sh -",
+      "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
+      # install argocd
+      "kubectl create namespace argocd",
+      "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml",
+      # install UXP Crossplane
+      "kubectl create namespace crossplane",
+      "curl -sL https://cli.upbound.io | sh",
+      "sudo mv up /usr/local/bin/",
+      "up uxp install -n crossplane",
     ]
   }
 }

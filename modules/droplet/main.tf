@@ -45,12 +45,13 @@ resource "digitalocean_droplet" "droplet" {
       "kubectl create namespace argocd",
       "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml",
       "kubectl patch svc argocd-server -n argocd -p '{\"spec\": {\"type\": \"LoadBalancer\"}}'",
-      "cat > argo-creds.json << EOF { \"username\": \"admin\", \"password\": \"$(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode)\" } EOF",
       # install UXP Crossplane
       "kubectl create namespace crossplane",
       "curl -sL https://cli.upbound.io | sh",
       "sudo mv up /usr/local/bin/",
       "up uxp install -n crossplane",
+      # generate creds file
+      "echo \"{ \"username\": \"admin\", \"password\": \"$(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode)\" }\" > argocd-creds.json"
     ]
   }
 }

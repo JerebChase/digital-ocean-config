@@ -27,6 +27,23 @@ resource "digitalocean_droplet" "droplet" {
   ssh_keys = [
     digitalocean_ssh_key.terraform_ssh_key.id
   ]
+
+  connection {
+    host = self.ipv4_address
+    user = "root"
+    type = "ssh"
+    private_key = tls_private_key.ssh_key.private_key_pem
+    timeout = "2m"
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "export PATH=$PATH:/usr/bin",
+      # install nginx
+      "sudo apt update",
+      "sudo apt install -y nginx"
+    ]
+  }
 }
 
 resource "digitalocean_project_resources" "project_resources" {

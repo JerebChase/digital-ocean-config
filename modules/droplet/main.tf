@@ -40,7 +40,8 @@ resource "digitalocean_droplet" "droplet" {
     inline = [
       # install k3s
       "curl -sfL https://get.k3s.io | sh -",
-      "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
+      "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc",
+      "source ~/.bashrc",
       # install argocd
       "kubectl create namespace argocd",
       "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml",
@@ -56,15 +57,7 @@ resource "digitalocean_droplet" "droplet" {
       "./get_helm.sh",
       # install Port K8s Exporter
       "helm repo add --force-update port-labs https://port-labs.github.io/helm-charts",
-      "helm upgrade --install my-cluster port-labs/port-k8s-exporter \\",
-      "   --create-namespace --namespace port-k8s-exporter \\",
-      "   --set secret.secrets.portClientId='${var.port_client_id}' \\",
-      "   --set secret.secrets.portClientSecret='${var.port_client_secret}' \\",
-      "   --set portBaseUrl='https://api.getport.io' \\",
-      "   --set stateKey='my-cluster \\",
-      "   --set integration.eventListener.type='POLLING' \\",
-      "   --set 'extraEnv[0].name'='CLUSTER_NAME' \\",
-      "   --set 'extraEnv[0].value'='my-cluster'"
+      "helm upgrade --install my-cluster port-labs/port-k8s-exporter --create-namespace --namespace port-k8s-exporter --set secret.secrets.portClientId='${var.port_client_id}' --set secret.secrets.portClientSecret='${var.port_client_secret}' --set portBaseUrl='https://api.getport.io' --set stateKey='my-cluster' --set integration.eventListener.type='POLLING' --set 'extraEnv[0].name'='CLUSTER_NAME' --set 'extraEnv[0].value'='my-cluster'"
     ]
   }
 }

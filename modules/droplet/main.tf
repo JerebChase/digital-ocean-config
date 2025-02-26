@@ -70,12 +70,18 @@ resource "digitalocean_droplet" "droplet" {
 
     # Log everything
     exec > /var/log/user-data.log 2>&1
+    export HOME=/root
 
     # Install k3s
     curl -sfL https://get.k3s.io | sh -
     echo "Waiting for K3s to be ready..."
     until kubectl get nodes; do sleep 5; done
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    
+    # Install Helm
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
 
     # Install ArgoCD
     kubectl create namespace argocd
@@ -87,11 +93,6 @@ resource "digitalocean_droplet" "droplet" {
     curl -sL https://cli.upbound.io | sh
     sudo mv up /usr/local/bin/
     up uxp install -n crossplane
-
-    # Install Helm
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-    chmod 700 get_helm.sh
-    ./get_helm.sh
 
     echo "Setup complete!"
   EOF

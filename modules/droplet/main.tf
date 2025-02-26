@@ -77,11 +77,11 @@ resource "digitalocean_droplet" "droplet" {
     echo "Waiting for K3s to be ready..."
     until kubectl get nodes; do sleep 5; done
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-    
+
     # Install Helm
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-    chmod 700 get_helm.sh
-    ./get_helm.sh
+    curl -LO https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
+    tar -xzvf helm-v3.13.2-linux-amd64.tar.gz
+    sudo mv linux-amd64/helm /usr/local/bin/helm
 
     # Install ArgoCD
     kubectl create namespace argocd

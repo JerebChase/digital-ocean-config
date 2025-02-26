@@ -73,6 +73,8 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install k3s
     curl -sfL https://get.k3s.io | sh -
+    echo "Waiting for K3s to be ready..."
+    until kubectl get nodes; do sleep 5; done
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
     # Install ArgoCD
@@ -90,18 +92,6 @@ resource "digitalocean_droplet" "droplet" {
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
     chmod 700 get_helm.sh
     ./get_helm.sh
-
-    # Install Port K8s Exporter
-    helm repo add --force-update port-labs https://port-labs.github.io/helm-charts
-    helm upgrade --install my-cluster port-labs/port-k8s-exporter \
-      --create-namespace --namespace port-k8s-exporter \
-      --set secret.secrets.portClientId='${var.port_client_id}' \
-      --set secret.secrets.portClientSecret='${var.port_client_secret}' \
-      --set portBaseUrl='https://api.getport.io' \
-      --set stateKey='my-cluster' \
-      --set integration.eventListener.type='POLLING' \
-      --set 'extraEnv[0].name'='CLUSTER_NAME' \
-      --set 'extraEnv[0].value'='my-cluster'
 
     echo "Setup complete!"
   EOF

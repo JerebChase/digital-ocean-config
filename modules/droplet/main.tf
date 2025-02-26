@@ -42,6 +42,7 @@ resource "digitalocean_droplet" "droplet" {
       "curl -sfL https://get.k3s.io | sh -",
       "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc",
       "source ~/.bashrc",
+      "sleep 30",
       # install argocd
       "kubectl create namespace argocd",
       "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml",

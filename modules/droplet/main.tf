@@ -94,6 +94,9 @@ resource "digitalocean_droplet" "droplet" {
     sudo mv up /usr/local/bin/
     up uxp install -n crossplane
 
+    # Install Port K8s Exporter
+    helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 
+
     echo "Setup complete!"
   EOF
 }

@@ -65,6 +65,11 @@ resource "digitalocean_droplet" "droplet" {
     chmod +x argocd-linux-amd64
     sudo mv argocd-linux-amd64 /usr/local/bin/argocd
 
+    # Login ArgoCD
+    ARGOCD_SERVER=$(kubectl -n argocd get svc argocd-server -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
+    ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+    argocd login $ARGOCD_SERVER --username admin --password $ARGOCD_PASSWORD --insecure
+
     # Install UXP Crossplane
     kubectl create namespace crossplane
     curl -sL https://cli.upbound.io | sh

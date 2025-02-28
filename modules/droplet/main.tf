@@ -60,6 +60,11 @@ resource "digitalocean_droplet" "droplet" {
     kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
     kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
+    # Install ArgoCD CLI
+    curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+    chmod +x argocd-linux-amd64
+    sudo mv argocd-linux-amd64 /usr/local/bin/argocd
+
     # Install UXP Crossplane
     kubectl create namespace crossplane
     curl -sL https://cli.upbound.io | sh

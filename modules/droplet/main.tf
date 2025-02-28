@@ -60,16 +60,6 @@ resource "digitalocean_droplet" "droplet" {
     kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
     kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
-    # Install ArgoCD CLI
-    curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-    chmod +x argocd-linux-amd64
-    sudo mv argocd-linux-amd64 /usr/local/bin/argocd
-
-    # Login ArgoCD
-    ARGOCD_SERVER=$(kubectl -n argocd get svc argocd-server -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
-    ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
-    argocd login $ARGOCD_SERVER --username admin --password $ARGOCD_PASSWORD --insecure
-
     # Install UXP Crossplane
     kubectl create namespace crossplane
     curl -sL https://cli.upbound.io | sh
@@ -89,11 +79,7 @@ resource "digitalocean_droplet" "droplet" {
       --set "extraEnv[0].value"="my-cluster"
 
     # Install argocd app
-    argocd app create gitops-config \
-      --repo https://github.com/JerebChase/gitops-config.git \
-      --dest-server https://kubernetes.default.svc \
-      --dest-namespace argocd \
-      --sync-policy automated
+    kubectl apply -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/applicationset.yml -n argocd
 
     echo "Setup complete!"
   EOF

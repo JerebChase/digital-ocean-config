@@ -69,8 +69,7 @@ resource "digitalocean_droplet" "droplet" {
     # Create crossplane secret
     kubectl create secret generic aws-secret \
       --namespace crossplane \
-      --from-literal=AWS_ACCESS_KEY_ID="${var.aws_access_key}" \
-      --from-literal=AWS_SECRET_ACCESS_KEY="${var.aws_secret_key}"
+      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
 
     # Install Port K8s Exporter
     helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 

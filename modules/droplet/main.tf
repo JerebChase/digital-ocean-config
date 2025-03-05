@@ -66,6 +66,12 @@ resource "digitalocean_droplet" "droplet" {
     sudo mv up /usr/local/bin/
     up uxp install -n crossplane
 
+    # Create crossplane secret
+    kubectl create secret generic aws-secret \
+      --namespace crossplane \
+      --from-literal=AWS_ACCESS_KEY_ID="${var.aws_access_key}" \
+      --from-literal=AWS_SECRET_ACCESS_KEY="${var.aws_secret_key}"
+
     # Install Port K8s Exporter
     helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 
     helm upgrade --install my-cluster port-labs/port-k8s-exporter \

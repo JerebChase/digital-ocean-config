@@ -50,41 +50,41 @@ resource "digitalocean_droplet" "droplet" {
     until kubectl get nodes; do sleep 5; done
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+    # Install Kustomize
+    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+    mv /root/kustomize /usr/local/bin/kustomize
+    chmod +x /usr/local/bin/kustomize
+
     # Install Helm
     curl -LO https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
     tar -xzvf helm-v3.13.2-linux-amd64.tar.gz
     sudo mv linux-amd64/helm /usr/local/bin/helm
 
-    # Install ArgoCD
-    kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-
     # Install UXP Crossplane
-    kubectl create namespace crossplane
-    curl -sL https://cli.upbound.io | sh
-    sudo mv up /usr/local/bin/
-    up uxp install -n crossplane
+    # kubectl create namespace crossplane
+    # curl -sL https://cli.upbound.io | sh
+    # sudo mv up /usr/local/bin/
+    # up uxp install -n crossplane
 
     # Create crossplane secret
-    kubectl create secret generic aws-secret \
-      --namespace crossplane \
-      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
+    # kubectl create secret generic aws-secret \
+    #   --namespace crossplane \
+    #   --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
 
     # Install Port K8s Exporter
-    helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 
-    helm upgrade --install my-cluster port-labs/port-k8s-exporter \
-      --create-namespace --namespace port-k8s-exporter \
-      --set secret.secrets.portClientId="${var.port_client_id}" \
-      --set secret.secrets.portClientSecret="${var.port_client_secret}" \
-      --set portBaseUrl="https://api.getport.io" \
-      --set stateKey="my-cluster" \
-      --set integration.eventListener.type="POLLING" \
-      --set "extraEnv[0].name"="CLUSTER_NAME" \
-      --set "extraEnv[0].value"="my-cluster"
+    # helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 
+    # helm upgrade --install my-cluster port-labs/port-k8s-exporter \
+    #   --create-namespace --namespace port-k8s-exporter \
+    #   --set secret.secrets.portClientId="${var.port_client_id}" \
+    #   --set secret.secrets.portClientSecret="${var.port_client_secret}" \
+    #   --set portBaseUrl="https://api.getport.io" \
+    #   --set stateKey="my-cluster" \
+    #   --set integration.eventListener.type="POLLING" \
+    #   --set "extraEnv[0].name"="CLUSTER_NAME" \
+    #   --set "extraEnv[0].value"="my-cluster"
 
-    # Install argocd app
-    kubectl apply -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/applicationset.yml -n argocd
+    # Install ArgoCD
+    kubectl apply -k https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/install
 
     echo "Setup complete!"
   EOF

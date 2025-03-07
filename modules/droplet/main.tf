@@ -52,7 +52,7 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install Kustomize
     curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-    mv /root/kustomize /usr/local/bin/kustomize
+    mv /kustomize /usr/local/bin/kustomize
     chmod +x /usr/local/bin/kustomize
 
     # Install Helm

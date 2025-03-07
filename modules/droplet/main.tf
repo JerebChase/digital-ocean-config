@@ -84,7 +84,7 @@ resource "digitalocean_droplet" "droplet" {
     #   --set "extraEnv[0].value"="my-cluster"
 
     # Install ArgoCD
-    kubectl apply -k https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/install
+    kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
 
     echo "Setup complete!"
   EOF

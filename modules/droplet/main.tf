@@ -50,10 +50,11 @@ resource "digitalocean_droplet" "droplet" {
     until kubectl get nodes; do sleep 5; done
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-    # Install Kustomize
-    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-    mv /kustomize /usr/local/bin/kustomize
-    chmod +x /usr/local/bin/kustomize
+    # Install ArgoCD
+    kubectl create namespace argocd
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+    kubectl patch configmap argocd-cm -n argocd --type=merge -p '{"data":{"application.resourceTrackingMethod":"annotation","resource.exclusions":"- apiGroups:\n  - \"*\"\n  kinds:\n  - ProviderConfigUsage"}}'
 
     # Install Helm
     curl -LO https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
@@ -84,7 +85,7 @@ resource "digitalocean_droplet" "droplet" {
     #   --set "extraEnv[0].value"="my-cluster"
 
     # Install ArgoCD
-    kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
+    # kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
 
     echo "Setup complete!"
   EOF

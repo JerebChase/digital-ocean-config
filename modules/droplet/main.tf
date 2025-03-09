@@ -91,6 +91,8 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install ArgoCD
     kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
+    kubectl apply -f https://github.com/JerebChase/gitops-config.git//argocd/crossplane-bootstrap/crossplane-helm-secret.yml
+    kubectl apply -n argocd -f https://github.com/JerebChase/gitops-config.git//argocd/crossplane-bootstrap/crossplane.yml
 
     echo "Setup complete!"
   EOF

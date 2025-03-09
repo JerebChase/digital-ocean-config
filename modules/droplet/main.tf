@@ -91,6 +91,7 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install ArgoCD
     kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server --namespace argocd --timeout=300s
     kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yml
 
     echo "Setup complete!"

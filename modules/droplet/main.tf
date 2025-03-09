@@ -50,6 +50,11 @@ resource "digitalocean_droplet" "droplet" {
     until kubectl get nodes; do sleep 5; done
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+    # Install Kustomize
+    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+    mv /kustomize /usr/local/bin/kustomize
+    chmod +x /usr/local/bin/kustomize
+
     # Install ArgoCD
     # kubectl create namespace argocd
     # kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml

@@ -88,13 +88,13 @@ resource "digitalocean_droplet" "droplet" {
     kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
     kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server --namespace argocd --timeout=300s
 
-    # Create crossplane secret
-    kubectl create secret generic aws-secret \
-      --namespace crossplane \
-      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
-
     # Install Crossplane
     kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
+
+    # Create crossplane secret
+    kubectl create secret generic aws-secret \
+      --namespace crossplane-system \
+      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
 
     echo "Setup complete!"
   EOF

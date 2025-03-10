@@ -23,7 +23,7 @@ resource "digitalocean_droplet" "droplet" {
   name   = "test-droplet"
   image  = "ubuntu-20-04-x64"
   region = "nyc3"
-  size   = "s-1vcpu-2gb"
+  size   = "s-2vcpu-4gb"
   ssh_keys = [
     digitalocean_ssh_key.terraform_ssh_key.id
   ]
@@ -72,11 +72,6 @@ resource "digitalocean_droplet" "droplet" {
     # sudo mv up /usr/local/bin/
     # up uxp install -n crossplane
 
-    # Create crossplane secret
-    # kubectl create secret generic aws-secret \
-    #   --namespace crossplane \
-    #   --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
-
     # Install Port K8s Exporter
     # helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 
     # helm upgrade --install my-cluster port-labs/port-k8s-exporter \
@@ -92,6 +87,13 @@ resource "digitalocean_droplet" "droplet" {
     # Install ArgoCD
     kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
     kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server --namespace argocd --timeout=300s
+
+    # Create crossplane secret
+    kubectl create secret generic aws-secret \
+      --namespace crossplane \
+      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
+
+    # Install Crossplane
     kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
 
     echo "Setup complete!"

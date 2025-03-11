@@ -55,26 +55,14 @@ resource "digitalocean_droplet" "droplet" {
     mv /kustomize /usr/local/bin/kustomize
     chmod +x /usr/local/bin/kustomize
 
-    # Install ArgoCD
-    # kubectl create namespace argocd
-    # kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-    # kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-    # kubectl patch configmap argocd-cm -n argocd --type=merge -p '{"data":{"application.resourceTrackingMethod":"annotation","resource.exclusions":"- apiGroups:\n  - \"*\"\n  kinds:\n  - ProviderConfigUsage"}}'
-
     # Install Helm
     curl -LO https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
     tar -xzvf helm-v3.13.2-linux-amd64.tar.gz
     sudo mv linux-amd64/helm /usr/local/bin/helm
 
     # Create crossplane secret
-    kubectl create secret generic aws-secret \
+    kubectl create secret generic aws-creds \
       --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
-
-    # Install UXP Crossplane
-    # kubectl create namespace crossplane
-    # curl -sL https://cli.upbound.io | sh
-    # sudo mv up /usr/local/bin/
-    # up uxp install -n crossplane
 
     # Install Port K8s Exporter
     # helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 

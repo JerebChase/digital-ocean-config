@@ -60,12 +60,15 @@ resource "digitalocean_droplet" "droplet" {
     tar -xzvf helm-v3.13.2-linux-amd64.tar.gz
     sudo mv linux-amd64/helm /usr/local/bin/helm
 
+    cat <<EOC > credentials.txt
+    [default]
+    aws_access_key_id = ${var.aws_access_key}
+    aws_secret_access_key = ${var.aws_secret_key}
+    EOC
+
     # Create crossplane secret
     kubectl create secret generic aws-creds \
-      #--from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
-      --from-literal=creds="[default]
-        aws_access_key_id=${var.aws_access_key}
-        aws_secret_access_key=${var.aws_secret_key}"
+      --from-file=creds=./credentials.txt
 
     # Install Port K8s Exporter
     # helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 

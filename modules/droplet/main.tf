@@ -84,7 +84,7 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install Crossplane
     kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
-    kubectl wait --for=condition=Established --timeout=300s namespace/crossplane-system
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=crossplane --namespace crossplane-system --timeout=300s
 
     # Create crossplane secret
     kubectl create secret generic aws-creds \

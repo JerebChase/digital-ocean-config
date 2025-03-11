@@ -66,6 +66,10 @@ resource "digitalocean_droplet" "droplet" {
     tar -xzvf helm-v3.13.2-linux-amd64.tar.gz
     sudo mv linux-amd64/helm /usr/local/bin/helm
 
+    # Create crossplane secret
+    kubectl create secret generic aws-secret \
+      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
+
     # Install UXP Crossplane
     # kubectl create namespace crossplane
     # curl -sL https://cli.upbound.io | sh
@@ -90,12 +94,6 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install Crossplane
     kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
-    kubectl wait --for=jsonpath="{.metadata.name}"=crossplane-system ns/crossplane-system --timeout=300s
-
-    # Create crossplane secret
-    kubectl create secret generic aws-secret \
-      --namespace crossplane-system \
-      --from-literal=creds="{\"aws_access_key_id\":\"${var.aws_access_key}\",\"aws_secret_access_key\":\"${var.aws_secret_key}\"}"
 
     echo "Setup complete!"
   EOF

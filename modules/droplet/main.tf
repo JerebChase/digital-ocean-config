@@ -66,10 +66,6 @@ resource "digitalocean_droplet" "droplet" {
     aws_secret_access_key = ${var.aws_secret_key}
     EOC
 
-    # Create crossplane secret
-    kubectl create secret generic aws-creds \
-      --from-file=creds=./credentials.txt
-
     # Install Port K8s Exporter
     # helm repo add --force-update port-labs https://port-labs.github.io/helm-charts 
     # helm upgrade --install my-cluster port-labs/port-k8s-exporter \
@@ -88,6 +84,12 @@ resource "digitalocean_droplet" "droplet" {
 
     # Install Crossplane
     kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=crossplane --namespace crossplane-system --timeout=300s
+
+    # Create crossplane secret
+    kubectl create secret generic aws-creds \
+      --namespace crossplane-system \
+      --from-file=creds=./credentials.txt
 
     echo "Setup complete!"
   EOF

@@ -79,17 +79,17 @@ resource "digitalocean_droplet" "droplet" {
     #   --set "extraEnv[0].value"="my-cluster"
 
     # Install ArgoCD
-    # kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
-    # kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server --namespace argocd --timeout=300s
+    kubectl apply -k https://github.com/JerebChase/gitops-config.git//argocd/install
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server --namespace argocd --timeout=300s
 
     # Install Crossplane
-    # kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
-    # kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=crossplane --namespace crossplane-system --timeout=300s
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/JerebChase/gitops-config/main/argocd/crossplane-bootstrap.yaml
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=crossplane --namespace crossplane-system --timeout=300s
 
     # Create crossplane secret
     # kubectl create secret generic aws-creds \
     #   --namespace crossplane-system \
-    #   --from-file=creds=./credentials.txt
+    #   --from-file=creds=../credentials.txt
 
     echo "Setup complete!"
   EOF
